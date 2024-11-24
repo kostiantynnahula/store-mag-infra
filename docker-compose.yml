@@ -22,9 +22,10 @@ services:
     depends_on:
       - kafka
     networks:
-      - common-network
+      - store-common-network
   kafka:
     image: obsidiandynamics/kafka
+    container_name: kafka
     restart: always
     ports:
       - "2181:2181"
@@ -39,9 +40,10 @@ services:
       KAFKA_RESTART_DELAY: "5"
       ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL: "0"
     networks:
-      - common-network
+      - store-common-network
 
-  store-mag-postgres:
+  postgres:
+    container_name: store-mag-postgres
     image: postgres
     restart: always
     ports:
@@ -51,10 +53,12 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
-      - common-network # Ensure this is included
-networks:
-  common-network:
-    driver: bridge
+      - store-common-network
 
 volumes:
   postgres:
+
+networks:
+  store-common-network:
+    driver: bridge
+    name: store-common-network
