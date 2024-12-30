@@ -48,15 +48,30 @@ resource "aws_security_group" "load_balancer_security_group" {
 
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_alb.application_load_balancer.arn #  load balancer
-  port              = "80"
+  port              = 80
   protocol          = "HTTP"
+
   default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Not Found Test"
-      status_code  = "404"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api_gateway_tg.arn
+  }
+}
+
+resource "aws_lb_target_group" "api_gateway_tg" {
+  name        = "api-gateway-target-group"
+  port        = 5000
+  protocol    = "HTTP"
+  vpc_id      = aws_default_vpc.default_vpc.id
+  target_type = "ip"
+
+  health_check {
+    protocol            = "HTTP"
+    path                = "/" # or your health endpoint
+    port                = "5000"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 }
 
@@ -67,7 +82,7 @@ resource "aws_security_group" "ecs_service_sg" {
 
   ingress {
     from_port       = 3000
-    to_port         = 4010
+    to_port         = 5000
     protocol        = "tcp"
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -75,7 +90,7 @@ resource "aws_security_group" "ecs_service_sg" {
   # Allow traffic between services in the same security group
   ingress {
     from_port = 3000
-    to_port   = 3001
+    to_port   = 5000
     protocol  = "tcp"
     self      = true
   }
