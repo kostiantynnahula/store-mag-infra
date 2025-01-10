@@ -68,6 +68,14 @@ output "api_gateway_tg_arn" {
   value = aws_lb_target_group.api_gateway_tg.arn
 }
 
+output "store_service_dns_namespace" {
+  value = aws_service_discovery_private_dns_namespace.store_mag_service_namespace.id
+}
+
+# output "store_mag_cert_arn" {
+#   value = aws_acm_certificate_validation.store_mag_cert_validation.certificate_arn
+# }
+
 ### ECR Repositories
 output "ecr_api_gateway_repository" {
   value = aws_ecr_repository.store_mag_api_gateway.repository_url

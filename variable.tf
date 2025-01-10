@@ -3,6 +3,11 @@ variable "region" {
   default     = "eu-west-1"
 }
 
+variable "domain_name" {
+  description = "The domain name for the application."
+  default     = "hotstoremag.com"
+}
+
 variable "database_name" {
   description = "The name of the database."
   default     = "store_mag"
